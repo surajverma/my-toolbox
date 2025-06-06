@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Use the new Poppins font variable from layout.tsx */
+  --font-sans: var(--font-poppins);
+  /* Keep the original mono font for code blocks */
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  /* Subtle gradient background */
+  background-color: #f8fafc; /* slate-50 */
+  background-image: linear-gradient(to bottom, #f0f9ff, #f8fafc); /* sky-50 to slate-50 */
+  color: #1e293b; /* slate-800 */
+  /* This now correctly references the --font-sans variable defined above */
+  font-family: var(--font-sans);
+}
+
+/* Custom styles for the prose class used in the Markdown preview */
+.prose {
+  --tw-prose-body: #334155; /* slate-700 */
+  --tw-prose-headings: #1e293b; /* slate-800 */
+  --tw-prose-lead: #475569; /* slate-600 */
+  --tw-prose-links: #0ea5e9; /* sky-500 */
+  --tw-prose-bold: #1e293b;
+  --tw-prose-counters: #64748b; /* slate-500 */
+  --tw-prose-bullets: #d1d5db; /* gray-300 */
+  --tw-prose-hr: #e5e7eb; /* gray-200 */
+  --tw-prose-quotes: #1e293b;
+  --tw-prose-quote-borders: #e5e7eb;
+  --tw-prose-captions: #6b7280; /* gray-500 */
+  --tw-prose-code: #0ea5e9;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #1f2937; /* gray-800 */
+  --tw-prose-th-borders: #e5e7eb;
+  --tw-prose-td-borders: #e5e7eb;
+}

@@ -244,7 +244,7 @@ export default function HomePage() {
 
       <main className='flex-grow container mx-auto px-4 py-8'>
         <header className='mb-8 text-center'>
-          <h1 className='text-4xl font-bold text-slate-800 font-heading'>My ToolBox</h1>
+          <h1 className='text-4xl font-bold text-slate-800'>My ToolBox</h1>
           <p className='text-xl text-slate-600 mt-2'>
             Online tools to make your life easy. Privacy-focused & simple to use.
           </p>
