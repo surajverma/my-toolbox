@@ -3,6 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // ADDED: Import Next.js Image component
 import ReactCrop, { type Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -33,6 +34,8 @@ export default function ImageCropperPage() {
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [aspect, setAspect] = useState<number | undefined>(16 / 9);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
+  // ADDED: State to hold image dimensions for the <Image> component
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
 
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -49,8 +52,10 @@ export default function ImageCropperPage() {
   }
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
+    setImageDimensions({ width, height }); // ADDED: Set image dimensions
+
     if (aspect) {
-      const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
     }
   }
@@ -111,7 +116,7 @@ export default function ImageCropperPage() {
       completedCrop.x * scaleX,
       completedCrop.y * scaleY,
       completedCrop.width * scaleX,
-      completedCrop.height * scaleY, // Fixed typo: completed_crop -> completedCrop
+      completedCrop.height * scaleY,
       0,
       0,
       canvas.width,
@@ -169,7 +174,16 @@ export default function ImageCropperPage() {
                   onChange={(_, percentCrop) => setCrop(percentCrop)}
                   onComplete={(c) => setCompletedCrop(c)}
                   aspect={aspect}>
-                  <img ref={imgRef} alt='Crop me' src={imgSrc} onLoad={onImageLoad} style={{ maxHeight: '70vh' }} />
+                  {/* FIX: Replaced <img> with next/image <Image> */}
+                  <Image
+                    ref={imgRef}
+                    alt='Crop me'
+                    src={imgSrc}
+                    width={imageDimensions.width}
+                    height={imageDimensions.height}
+                    onLoad={onImageLoad}
+                    style={{ maxHeight: '70vh', width: 'auto', height: 'auto' }}
+                  />
                 </ReactCrop>
               </div>
               {/* Controls and Download */}

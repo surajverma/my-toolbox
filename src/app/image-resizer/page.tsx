@@ -3,6 +3,7 @@
 
 import React, { useState, ChangeEvent, DragEvent, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // ADDED: Import Next.js Image component
 import JSZip from 'jszip';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -57,7 +58,14 @@ const ImagePreviewCard = ({ image, onRemove }: { image: ImageFileState; onRemove
       &times;
     </button>
     <div className='w-full h-32 bg-slate-100 flex items-center justify-center'>
-      <img src={image.previewUrl} alt={`Preview of ${image.file.name}`} className='max-h-full max-w-full' />
+      {/* FIX: Replaced <img> with next/image <Image> */}
+      <Image
+        src={image.previewUrl}
+        alt={`Preview of ${image.file.name}`}
+        width={image.originalWidth}
+        height={image.originalHeight}
+        className='max-h-full max-w-full object-contain'
+      />
     </div>
     <div className='p-3 text-center'>
       <p className='text-xs font-semibold text-slate-700 truncate' title={image.file.name}>
@@ -88,7 +96,7 @@ export default function ImageResizerPage() {
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
-            const img = new Image();
+            const img = document.createElement('img');
             img.onload = () => {
               resolve({
                 id: `${file.name}-${file.lastModified}-${index}`,
@@ -119,7 +127,6 @@ export default function ImageResizerPage() {
     setTargetWidth(newWidth);
 
     if (maintainAspectRatio && images.length > 0) {
-      // Use the first image as a representative for aspect ratio calculation in the UI
       const refImage = images[0];
       const aspectRatio = refImage.originalHeight / refImage.originalWidth;
       setTargetHeight(Math.round(newWidth * aspectRatio));
@@ -131,7 +138,6 @@ export default function ImageResizerPage() {
     setTargetHeight(newHeight);
 
     if (maintainAspectRatio && images.length > 0) {
-      // Use the first image as a representative for aspect ratio calculation in the UI
       const refImage = images[0];
       const aspectRatio = refImage.originalWidth / refImage.originalHeight;
       setTargetWidth(Math.round(newHeight * aspectRatio));
@@ -145,11 +151,10 @@ export default function ImageResizerPage() {
     const zip = new JSZip();
 
     for (const image of images) {
-      let finalWidth = targetWidth;
+      const finalWidth = targetWidth; // FIX: Changed 'let' to 'const'
       let finalHeight = targetHeight;
 
       if (maintainAspectRatio) {
-        // Recalculate based on each image's specific aspect ratio
         const aspectRatio = image.originalHeight / image.originalWidth;
         finalHeight = Math.round(targetWidth * aspectRatio);
       }
@@ -160,7 +165,7 @@ export default function ImageResizerPage() {
       const ctx = canvas.getContext('2d');
 
       if (ctx) {
-        const img = new Image();
+        const img = document.createElement('img');
         img.src = image.previewUrl;
         await new Promise((resolve) => {
           img.onload = resolve;
@@ -191,7 +196,7 @@ export default function ImageResizerPage() {
     URL.revokeObjectURL(link.href);
 
     setIsResizing(false);
-    setImages([]); // Reset UI
+    setImages([]);
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

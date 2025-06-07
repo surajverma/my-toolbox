@@ -82,11 +82,11 @@ export default function FindReplacePage() {
           isRegexFlagsProvided: false,
         };
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       return {
         outputText: inputText,
         matchCount: 0,
-        error: e.message,
+        error: (e as Error).message,
         isRegexFlagsProvided: false,
       };
     }

@@ -140,12 +140,12 @@ export default function ColorConverterPage() {
             <h3 className='text-lg font-semibold text-slate-700'>Color Model Explanations</h3>
             <div className='mt-2 text-sm text-slate-600 space-y-2'>
               <p>
-                <strong>HEX (Hexadecimal):</strong> A 6-digit code representing Red, Green, and Blue values. It's
+                <strong>HEX (Hexadecimal):</strong> A 6-digit code representing Red, Green, and Blue values. It&apos;s
                 compact and widely used in web design.
               </p>
               <p>
                 <strong>RGB (Red, Green, Blue):</strong> Defines a color by the intensity of Red, Green, and Blue, each
-                from 0 to 255. It's the standard for digital displays.
+                from 0 to 255. It&apos;s the standard for digital displays.
               </p>
               <p>
                 <strong>HSL (Hue, Saturation, Lightness):</strong> An intuitive model where Hue is the color type (e.g.,

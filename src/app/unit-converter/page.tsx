@@ -129,7 +129,7 @@ export default function UnitConverterPage() {
   }, [inputValue, fromUnit, toUnit, category, convert]);
 
   const handleSwap = () => {
-    const currentInput = inputValue;
+    // const currentInput = inputValue; // FIX: Removed unused variable
     const currentOutput = outputValue;
     setFromUnit(toUnit);
     setToUnit(fromUnit);

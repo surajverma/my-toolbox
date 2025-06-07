@@ -1,7 +1,7 @@
 // src/app/contrast-checker/page.tsx
 'use client';
 
-import React, { useState, useMemo, ChangeEvent } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import tinycolor from 'tinycolor2';
 import Navbar from '@/components/Navbar';

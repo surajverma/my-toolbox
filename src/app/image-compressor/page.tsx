@@ -3,6 +3,7 @@
 
 import React, { useState, ChangeEvent, DragEvent, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import imageCompression from 'browser-image-compression';
 import JSZip from 'jszip';
 import Navbar from '@/components/Navbar';
@@ -19,6 +20,8 @@ interface ImageFileState {
   originalSize: number;
   compressedSize?: number;
   compressedFile?: File;
+  width: number;
+  height: number;
 }
 
 // A component to display each image card with its progress and actions
@@ -40,7 +43,13 @@ const ImageCard = ({
         &times;
       </button>
       <div className='w-full h-32 bg-slate-100 flex items-center justify-center'>
-        <img src={image.previewUrl} alt={`Preview of ${image.file.name}`} className='max-h-full max-w-full' />
+        <Image
+          src={image.previewUrl}
+          alt={`Preview of ${image.file.name}`}
+          width={image.width}
+          height={image.height}
+          className='max-h-full max-w-full object-contain'
+        />
       </div>
       <div className='p-3'>
         <p className='text-xs font-semibold text-slate-700 truncate' title={image.file.name}>
@@ -64,9 +73,12 @@ const ImageCard = ({
 
         {image.status === 'done' && image.compressedSize !== undefined && (
           <div className='mt-2 text-xs'>
+            <p className='text-slate-500'>
+              <del>{(image.originalSize / 1024).toFixed(1)} KB</del>
+            </p>
             <p className='font-bold text-green-600'>{(image.compressedSize / 1024).toFixed(1)} KB</p>
             <p className='text-green-700'>
-              Saved {((1 - image.compressedSize / image.originalSize) * 100).toFixed(1)}%
+              Saved {Math.max(0, (1 - image.compressedSize / image.originalSize) * 100).toFixed(1)}%
             </p>
             <button
               onClick={() => onDownload(image)}
@@ -92,18 +104,32 @@ export default function ImageCompressorPage() {
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
-    const newImageFiles: ImageFileState[] = Array.from(files)
+    const newImageFilesPromises: Promise<ImageFileState>[] = Array.from(files)
       .filter((file) => file.type.startsWith('image/'))
-      .map((file, index) => ({
-        id: `${file.name}-${file.lastModified}-${index}`,
-        file,
-        previewUrl: URL.createObjectURL(file),
-        status: 'pending',
-        progress: 0,
-        originalSize: file.size,
-      }));
+      .map((file, index) => {
+        return new Promise((resolve) => {
+          const previewUrl = URL.createObjectURL(file);
+          const img = document.createElement('img');
+          img.onload = () => {
+            resolve({
+              id: `${file.name}-${file.lastModified}-${index}`,
+              file,
+              previewUrl,
+              status: 'pending',
+              progress: 0,
+              originalSize: file.size,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            });
+            // No need to revoke previewUrl here, as it's used by the <Image> component
+          };
+          img.src = previewUrl;
+        });
+      });
 
-    setImages((prev) => [...prev, ...newImageFiles]);
+    Promise.all(newImageFilesPromises).then((newImageFiles) => {
+      setImages((prev) => [...prev, ...newImageFiles]);
+    });
   };
 
   const handleStartCompression = async () => {
@@ -121,7 +147,6 @@ export default function ImageCompressorPage() {
   };
 
   const compressSingleImage = async (imageState: ImageFileState) => {
-    // Set status to compressing
     setImages((prev) => prev.map((img) => (img.id === imageState.id ? { ...img, status: 'compressing' } : img)));
 
     try {
@@ -136,24 +161,41 @@ export default function ImageCompressorPage() {
         },
       };
       const compressedBlob = await imageCompression(imageState.file, options);
-      const compressedFile = new File([compressedBlob], `compressed_${imageState.file.name}`, {
-        type: compressedBlob.type,
-      });
 
-      // Update with final compressed data
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === imageState.id
-            ? {
-                ...img,
-                status: 'done',
-                progress: 100,
-                compressedFile: compressedFile,
-                compressedSize: compressedFile.size,
-              }
-            : img
-        )
-      );
+      // FIX: Check if the compressed file is actually smaller
+      if (compressedBlob.size < imageState.originalSize) {
+        const compressedFile = new File([compressedBlob], `compressed_${imageState.file.name}`, {
+          type: compressedBlob.type,
+        });
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageState.id
+              ? {
+                  ...img,
+                  status: 'done',
+                  progress: 100,
+                  compressedFile: compressedFile,
+                  compressedSize: compressedFile.size,
+                }
+              : img
+          )
+        );
+      } else {
+        // If not smaller, use the original file and show 0% savings
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageState.id
+              ? {
+                  ...img,
+                  status: 'done',
+                  progress: 100,
+                  compressedFile: imageState.file, // Revert to original file
+                  compressedSize: imageState.originalSize, // Revert to original size
+                }
+              : img
+          )
+        );
+      }
     } catch (error) {
       console.error(`Error compressing ${imageState.file.name}:`, error);
       setImages((prev) => prev.map((img) => (img.id === imageState.id ? { ...img, status: 'error' } : img)));
@@ -195,7 +237,13 @@ export default function ImageCompressorPage() {
   };
 
   const removeImage = (idToRemove: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== idToRemove));
+    setImages((prev) => {
+      const imageToRemove = prev.find((img) => img.id === idToRemove);
+      if (imageToRemove) {
+        URL.revokeObjectURL(imageToRemove.previewUrl);
+      }
+      return prev.filter((img) => img.id !== idToRemove);
+    });
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -240,49 +288,46 @@ export default function ImageCompressorPage() {
         </header>
 
         <section className='bg-white p-6 md:p-8 rounded-lg shadow-xl max-w-6xl mx-auto'>
-          {images.length === 0 && (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-4 border-dashed rounded-xl p-8 text-center transition-colors duration-200 ease-in-out
-                        ${
-                          isDragging
-                            ? 'border-sky-500 bg-sky-50'
-                            : 'border-slate-300 hover:border-sky-400 hover:bg-slate-50'
-                        }
-                        cursor-pointer`}>
-              <input
-                ref={fileInputRef}
-                type='file'
-                id='imageUpload'
-                multiple
-                accept='image/*'
-                onChange={handleFileChange}
-                className='hidden'
-              />
-              <div className='flex flex-col items-center justify-center text-slate-500 pointer-events-none'>
-                <svg
-                  className='w-16 h-16 mb-4 text-slate-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='1.5'
-                    d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12L12 19M12 12l3 3M12 12L9 3'></path>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M12 15l3-3-3-3'></path>
-                </svg>
-                <p className='text-lg font-semibold'>
-                  {isDragging ? 'Release to drop files' : 'Drag & drop images here, or click to select'}
-                </p>
-                <p className='text-sm'>All processing is done in your browser.</p>
-              </div>
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-4 border-dashed rounded-xl p-8 text-center transition-colors duration-200 ease-in-out mb-6
+                      ${
+                        isDragging
+                          ? 'border-sky-500 bg-sky-50'
+                          : 'border-slate-300 hover:border-sky-400 hover:bg-slate-50'
+                      }
+                      cursor-pointer`}>
+            <input
+              ref={fileInputRef}
+              type='file'
+              id='imageUpload'
+              multiple
+              accept='image/*'
+              onChange={handleFileChange}
+              className='hidden'
+            />
+            <div className='flex flex-col items-center justify-center text-slate-500 pointer-events-none'>
+              <svg
+                className='w-16 h-16 mb-4 text-slate-400'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='1.5'
+                  d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'></path>
+              </svg>
+              <p className='text-lg font-semibold'>
+                {isDragging ? 'Release to drop files' : 'Drag & drop images here, or click to select'}
+              </p>
+              <p className='text-sm'>All processing is done in your browser.</p>
             </div>
-          )}
+          </div>
 
           {images.length > 0 && (
             <div>

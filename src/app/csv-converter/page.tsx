@@ -1,7 +1,7 @@
 // src/app/csv-converter/page.tsx
 'use client';
 
-import React, { useState, useMemo, ChangeEvent } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Papa from 'papaparse';
 import Navbar from '@/components/Navbar';
@@ -13,7 +13,7 @@ const SAMPLE_CSV = `Year,Make,Model,Length
 2000,Mercury,Cougar,2.38`;
 
 // Helper function to convert JSON to a simple XML string
-const jsonToXml = (json: any[]): string => {
+const jsonToXml = (json: Record<string, unknown>[]): string => {
   if (!json || json.length === 0) return '';
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n';
   json.forEach((item) => {
@@ -55,7 +55,7 @@ export default function CsvConverterPage() {
   }, [parsedJson]);
 
   const xmlOutput = useMemo(() => {
-    return jsonToXml(parsedJson);
+    return jsonToXml(parsedJson as Record<string, unknown>[]);
   }, [parsedJson]);
 
   const handleCopy = () => {

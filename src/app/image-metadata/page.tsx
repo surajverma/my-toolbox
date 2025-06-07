@@ -3,6 +3,7 @@
 
 import React, { useState, ChangeEvent, DragEvent, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import EXIF from 'exif-js';
 import piexif from 'piexifjs';
 import JSZip from 'jszip';
@@ -11,7 +12,7 @@ import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface Metadata {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ProcessedImage {
@@ -21,6 +22,8 @@ interface ProcessedImage {
   src: string;
   metadata: Metadata | null;
   hasMetadata: boolean;
+  width: number;
+  height: number;
 }
 
 // Component to display a card for each processed image
@@ -34,7 +37,7 @@ const ImageResultCard = ({
   onDownloadSingle: (image: ProcessedImage) => void;
 }) => {
   return (
-    <div className='relative bg-white border rounded-lg shadow-sm overflow-hidden'>
+    <div className='relative bg-white border rounded-lg shadow-sm overflow-hidden flex flex-col'>
       {/* Remove from list button */}
       <button
         onClick={() => onRemove(image.id)}
@@ -43,14 +46,32 @@ const ImageResultCard = ({
         &times;
       </button>
 
-      <img src={image.src} alt={`Preview of ${image.name}`} className='w-full h-40 object-cover bg-slate-100' />
-      <div className='p-4'>
+      <Image
+        src={image.src}
+        alt={`Preview of ${image.name}`}
+        width={image.width}
+        height={image.height}
+        className='w-full h-40 object-cover bg-slate-100'
+      />
+      <div className='p-4 flex flex-col flex-grow'>
         <p className='text-sm font-semibold text-slate-800 truncate' title={image.name}>
           {image.name}
         </p>
         <p className={`text-xs mt-1 ${image.hasMetadata ? 'text-orange-600' : 'text-green-600'}`}>
           {image.hasMetadata ? 'Contains Metadata' : 'No Metadata Found'}
         </p>
+
+        <div className='flex-grow mt-2'>
+          {image.hasMetadata && (
+            <details className='text-xs'>
+              <summary className='cursor-pointer text-blue-600 hover:underline'>View Metadata</summary>
+              <pre className='mt-2 p-2 bg-slate-50 rounded-md max-h-48 overflow-auto text-slate-700 font-mono'>
+                <code>{JSON.stringify(image.metadata, null, 2)}</code>
+              </pre>
+            </details>
+          )}
+        </div>
+
         <button
           onClick={() => onDownloadSingle(image)}
           disabled={!image.hasMetadata}
@@ -78,38 +99,46 @@ export default function ImageMetadataPage() {
 
   const processFiles = (files: FileList) => {
     setError(null);
-    const newImages: ProcessedImage[] = [];
+    const newImagesPromises: Promise<ProcessedImage>[] = [];
 
     Array.from(files).forEach((file, index) => {
       if (!file.type.startsWith('image/jpeg')) {
-        // Silently ignore non-jpeg files in a batch upload, or show a collective error later.
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const src = e.target?.result as string;
+      const promise = new Promise<ProcessedImage>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const src = e.target?.result as string;
+          const img = document.createElement('img');
+          img.onload = () => {
+            // @ts-expect-error - The type definitions for exif-js are incorrect for this function call.
+            // The type definitions for exif-js are incorrect for this function call.
+            EXIF.getData(img, function (this: HTMLImageElement) {
+              const allTags = EXIF.getAllTags(this);
+              const hasMetadata = allTags && Object.keys(allTags).length > 0;
 
-        EXIF.getData(file as any, function (this: any) {
-          const allTags = EXIF.getAllTags(this);
-          const hasMetadata = allTags && Object.keys(allTags).length > 0;
+              resolve({
+                id: `${file.name}-${file.lastModified}-${index}`,
+                name: file.name,
+                type: file.type,
+                src,
+                metadata: allTags,
+                hasMetadata,
+                width: img.naturalWidth,
+                height: img.naturalHeight,
+              });
+            });
+          };
+          img.src = src;
+        };
+        reader.readAsDataURL(file);
+      });
+      newImagesPromises.push(promise);
+    });
 
-          newImages.push({
-            id: `${file.name}-${file.lastModified}-${index}`,
-            name: file.name,
-            type: file.type,
-            src,
-            metadata: allTags,
-            hasMetadata,
-          });
-
-          // When the last file is processed, update the state
-          if (newImages.length === Array.from(files).filter((f) => f.type.startsWith('image/jpeg')).length) {
-            setProcessedImages((prev) => [...prev, ...newImages]);
-          }
-        });
-      };
-      reader.readAsDataURL(file);
+    Promise.all(newImagesPromises).then((newImages) => {
+      setProcessedImages((prev) => [...prev, ...newImages]);
     });
   };
 

@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // ADDED: Import Next.js Image component
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -125,7 +126,7 @@ export default function PlaceholderGeneratorPage() {
   const [height, setHeight] = useState(400);
   const [bgColor, setBgColor] = useState('cccccc');
   const [textColor, setTextColor] = useState('969696');
-  const [text, setText] = useState('This is a test image and this is overflowing');
+  const [text, setText] = useState(`${width}x${height}`);
   const [imageUrl, setImageUrl] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -234,7 +235,16 @@ export default function PlaceholderGeneratorPage() {
             <h2 className='text-xl font-semibold text-slate-700 border-b pb-2 mb-4'>Preview</h2>
             <div className='flex justify-center items-center bg-slate-100 rounded-md p-4 min-h-[200px]'>
               <canvas ref={canvasRef} style={{ display: 'none' }} />
-              {imageUrl && <img src={imageUrl} alt='Generated placeholder' className='max-w-full h-auto shadow-md' />}
+              {/* FIX: Replaced <img> with next/image <Image> */}
+              {imageUrl && (
+                <Image
+                  src={imageUrl}
+                  alt='Generated placeholder'
+                  width={width}
+                  height={height}
+                  className='max-w-full h-auto shadow-md'
+                />
+              )}
             </div>
             <div className='mt-4'>
               <label htmlFor='image-url' className='block text-sm font-medium text-slate-600 mb-1'>

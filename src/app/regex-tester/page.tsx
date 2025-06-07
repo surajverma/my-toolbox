@@ -151,11 +151,13 @@ export default function RegexTesterPage() {
   const [flags, setFlags] = useState<string>('g');
   const [testString, setTestString] = useState<string>('Hello World 123');
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false); // ADDED: State to track client-side render
 
-  // =================================================================
-  // START: LOGIC TO READ FROM URL
-  // This effect runs once on page load to check for URL parameters.
-  // =================================================================
+  // ADDED: useEffect to set isClient to true after initial render
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlPattern = params.get('pattern');
@@ -168,9 +170,6 @@ export default function RegexTesterPage() {
       setFlags(urlFlags);
     }
   }, []);
-  // =================================================================
-  // END: LOGIC TO READ FROM URL
-  // =================================================================
 
   const { matches, executionTime } = useMemo(() => {
     if (!pattern) {
@@ -178,10 +177,7 @@ export default function RegexTesterPage() {
       return { matches: [], executionTime: 0 };
     }
 
-    // --- FIX STARTS HERE ---
-    // Moved startTime declaration to the top of the hook's scope.
     const startTime = performance.now();
-    // --- FIX ENDS HERE ---
 
     try {
       const regex = new RegExp(pattern, flags);
@@ -193,8 +189,8 @@ export default function RegexTesterPage() {
         matches: allMatches,
         executionTime: endTime - startTime,
       };
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError((e as Error).message);
       return { matches: [], executionTime: 0 };
     }
   }, [pattern, flags, testString]);
@@ -262,7 +258,9 @@ export default function RegexTesterPage() {
             ) : matches.length > 0 ? (
               <div>
                 <p className='text-sm text-slate-600 mb-2'>
-                  Found {matches.length} match{matches.length === 1 ? '' : 'es'} in {executionTime.toFixed(2)}ms.
+                  Found {matches.length} match{matches.length === 1 ? '' : 'es'}
+                  {/* FIX: Only render execution time on the client after hydration */}
+                  {isClient && ` in ${executionTime.toFixed(2)}ms.`}
                 </p>
                 {matches.map((match, i) => (
                   <MatchResult key={i} match={match} />
