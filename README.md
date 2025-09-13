@@ -1,11 +1,5 @@
 # ToolStack
-> **A privacy-first collection of useful web tools and utilities. All tools run entirely in your browser—your data never leaves your device.**
-		  <h1 className='text-4xl font-bold text-slate-800 font-heading'>ToolStack</h1>
-		  ToolStack
-# My ToolBox
-
-> **A privacy-first collection of useful web tools and utilities. All tools run entirely in your browser—your data never leaves your device.**
-
+**A privacy-first collection of useful web tools and utilities. All tools run entirely in your browser—your data never leaves your device.**
 ---
 
 ## ✨ Features
@@ -87,6 +81,6 @@ MIT. See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Credits
+## 🙏 Thank you
 
-Created by [Suraj Verma](https://www.surajverma.in). Inspired by the need for privacy-friendly, no-nonsense web utilities.
+If you like my work, you can [buy me a coffee ☕](https://ko-fi.com/skv)
