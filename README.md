@@ -1,8 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ToolStack
+> **A privacy-first collection of useful web tools and utilities. All tools run entirely in your browser—your data never leaves your device.**
+		  <h1 className='text-4xl font-bold text-slate-800 font-heading'>ToolStack</h1>
+		  ToolStack
+# My ToolBox
 
-## Getting Started
+> **A privacy-first collection of useful web tools and utilities. All tools run entirely in your browser—your data never leaves your device.**
 
-First, run the development server:
+---
+
+## ✨ Features
+
+- **Privacy-focused:** All processing happens locally in your browser. No data is sent to any server.
+- **No sign-up, no ads, no tracking.**
+- **Open source:** Contributions welcome!
+- **Modern UI:** Built with Next.js, React, and Tailwind CSS.
+
+---
+
+## 🧰 Available Tools
+
+- **Image Compressor** – Reduce image file sizes quickly and easily.
+- **Regex Tester & Explainer** – Test your regular expressions and get explanations.
+- **Text Diff Checker** – Compare two pieces of text and highlight differences.
+- **Color Code Converter** – Convert HEX, RGB, HSL color codes instantly.
+- **Placeholder Image Generator** – Create custom placeholder images on the fly.
+- **Text Statistics / Analyzer** – Get instant stats on your text, like word count, characters, and more.
+- **Image Metadata Remover** – View and remove EXIF metadata from your JPEG images to protect your privacy.
+- **Markdown Editor** – A simple Markdown editor with a live preview and HTML export.
+- **CSV to JSON/XML Converter** – Convert CSV data into JSON or XML formats.
+- **Text Contrast Checker** – Check if the contrast between two colors meets accessibility standards.
+- **Image Resizer** – Quickly resize images to your specified dimensions, all in your browser.
+- **Image Cropper** – Crop images to your desired dimensions with an easy-to-use interface.
+- **Lorem Ipsum Generator** – Generate placeholder text with options for paragraphs, sentences, or words.
+- **Easy Regex Generator** – Create common regular expressions by building a sentence, no syntax required.
+- **Find & Replace in Text** – Perform a find and replace on a block of text, with optional Regex support.
+- **Data Anonymizer** – Automatically find and scrub sensitive data like emails and IP addresses from text.
+- **CSS Specificity Calculator** – Calculate and understand the specificity of CSS selectors.
+- **Unit Converter** – Convert between various units of measurement.
+- **HTTP Status Code Explainer** – Quickly find and understand the meaning of HTTP status codes.
+- **List Cleaner & Formatter** – Quickly sort, clean, and format lists of text with various options.
+- **HTML Tag Explainer** – A quick reference guide for all standard HTML tags and their uses.
+
+---
+
+## 🚀 Getting Started
+
+Clone the repo and install dependencies:
+
+```bash
+git clone https://github.com/SurajVerma/my-toolbox.git
+cd my-toolbox
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
@@ -14,23 +65,28 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛡️ Privacy
 
-## Learn More
+All tools work 100% in your browser. No data is ever uploaded or stored remotely. You can use these tools offline after the first load.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤝 Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Contributions, bug reports, and suggestions are welcome! Please open an issue or submit a pull request.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT. See [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Credits
+
+Created by [Suraj Verma](https://www.surajverma.in). Inspired by the need for privacy-friendly, no-nonsense web utilities.

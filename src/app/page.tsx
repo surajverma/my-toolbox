@@ -244,9 +244,9 @@ export default function HomePage() {
 
       <main className='flex-grow container mx-auto px-4 py-8'>
         <header className='mb-8 text-center'>
-          <h1 className='text-4xl font-bold text-slate-800 font-heading'>My ToolBox</h1>
-          <p className='text-xl text-slate-600 mt-2'>
-            Online tools to make your life easy. Privacy-focused & simple to use.
+          <h1 className='text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-600 font-heading drop-shadow-lg tracking-tight'>ToolStack</h1>
+          <p className='text-xl text-slate-500 mt-2 font-medium'>
+            Privacy-first, beautiful, and blazing fast browser tools. Your data never leaves your device.
           </p>
         </header>
 

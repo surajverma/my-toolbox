@@ -1,27 +1,18 @@
 import type { Metadata } from 'next';
 
-import { Poppins, Lexend_Deca } from 'next/font/google'; // Import Lexend_Deca
+import { Inter } from 'next/font/google';
 import './globals.css';
 
-// Configure the Poppins font for body text
-const poppins = Poppins({
-  weight: ['400', '600', '700'],
+const inter = Inter({
+  weight: ['400', '600', '700', '800'],
   subsets: ['latin'],
-  variable: '--font-poppins', // CSS variable for body font
-  display: 'swap',
-});
-
-// Configure the Lexend Deca font for headings
-const lexend = Lexend_Deca({
-  weight: ['400', '700'], // Weights for regular and bold headings
-  subsets: ['latin'],
-  variable: '--font-lexend', // CSS variable for heading font
+  variable: '--font-inter',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'My ToolBox - Free Privacy-Focused Online Tools',
-  description: 'A collection of simple, free, and privacy-focused online tools that work entirely in your browser.',
+  title: 'ToolStack - Free Privacy-Focused Online Tools',
+  description: 'ToolStack is a collection of simple, free, and privacy-focused online tools that work entirely in your browser.',
 };
 
 export default function RootLayout({
@@ -31,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${poppins.variable} ${lexend.variable} font-sans antialiased`}>{children}</body>
+  <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
     </html>
   );
 }

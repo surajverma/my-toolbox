@@ -31,8 +31,8 @@ const config: Config = {
         foreground: 'var(--foreground)',
       },
       fontFamily: {
-        sans: ['var(--font-poppins)'],
-        heading: ['var(--font-lexend)'],
+        sans: ['var(--font-inter)'],
+        heading: ['var(--font-inter)'],
       },
     },
   },
