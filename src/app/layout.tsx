@@ -22,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-  <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
     </html>
   );
 }

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="ts-gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#ts-gradient)"/>
+  <g>
+    <rect x="16" y="20" width="32" height="8" rx="2" fill="#fff"/>
+    <rect x="16" y="32" width="32" height="8" rx="2" fill="#fff"/>
+    <rect x="24" y="44" width="16" height="4" rx="2" fill="#fff"/>
+  </g>
+  <text x="32" y="16" text-anchor="middle" font-size="14" font-family="Inter, Arial, sans-serif" font-weight="bold" fill="#fff">TS</text>
+</svg>
